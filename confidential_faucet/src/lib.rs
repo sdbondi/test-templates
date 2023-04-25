@@ -26,15 +26,14 @@ use tari_template_lib::prelude::*;
 mod faucet_template {
     use super::*;
 
-    pub struct TestFaucet {
+    pub struct ConfidentialFaucet {
         vault: Vault,
     }
 
-    impl TestFaucet {
-        pub fn mint(initial_supply: Amount) -> Self {
-            let coins = ResourceBuilder::fungible()
-                .with_token_symbol("🪙")
-                .initial_supply(initial_supply)
+    impl ConfidentialFaucet {
+        pub fn mint(confidential_proof: ConfidentialOutputProof) -> Self {
+            let coins = ResourceBuilder::confidential("🪙")
+                .initial_supply(confidential_proof)
                 .build_bucket();
 
             Self {
@@ -42,15 +41,10 @@ mod faucet_template {
             }
         }
 
-        pub fn take_free_coins(&mut self) -> Bucket {
-            debug("Withdrawing 1000 coins from faucet");
-            self.vault.withdraw(Amount(1000))
-        }
-
-        // TODO: we can make a fungible utility template with these common operations
-        pub fn burn_coins(&mut self, amount: Amount) {
-            let mut bucket = self.vault.withdraw(amount);
-            bucket.burn();
+        pub fn take_free_coins(&mut self, proof: ConfidentialWithdrawProof) -> Bucket {
+            // let proof = engine().create_confidential_proof(partial_proof, Amount(1000));
+            debug("Withdrawing <unknown> coins from faucet");
+            self.vault.withdraw_confidential(proof)
         }
 
         pub fn total_supply(&self) -> Amount {
